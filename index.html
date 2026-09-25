@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>be my valentine</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 1;
+      max-width: 420px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .gif {
+      width: 200px;
+      margin: 10px auto 20px;
+    }
+
+    .gif img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    #yesBtn {
+      background-color: #ff4d6d;
+      color: white;
+      position: relative;
+      z-index: 9999;
+    }
+
+    #noBtn {
+      background-color: #ccc;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 16px;
+      color: #ff4d6d;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>will you be my valentine 💘</h1>
+
+    <div class="gif">
+      <img src="https://i.pinimg.com/originals/f7/e7/52/f7e752cdf31b6a4a56d45c431e869d27.gif" alt="cute gif">
+    </div>
+
+    <button id="yesBtn">YES</button>
+    <button id="noBtn">no</button>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const noMessages = [
+      "are you sure?? 😭",
+      "think again.",
+      "this is kinda hurting my feelings ngl",
+      "i’ll cry if u say no.",
+      "wow. ok.",
+      "last chance fr 😐",
+      "say yes before i embarrass myself more"
+    ];
+
+    let noClickCount = 0;
+    let yesScale = 1;
+
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const message = document.getElementById("message");
+
+    noBtn.addEventListener("click", () => {
+      message.textContent =
+        noMessages[Math.min(noClickCount, noMessages.length - 1)];
+      noClickCount++;
+
+      yesScale += 0.6;
+      yesBtn.style.transform = `scale(${yesScale})`;
+    });
+
+    yesBtn.addEventListener("click", () => {
+      document.body.innerHTML = `
+        <div style="
+          height:100vh;
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          background:linear-gradient(135deg, #ff9a9e, #fad0c4);
+          font-family:Arial, sans-serif;
+          text-align:center;
+        ">
+          <div style="
+            background:white;
+            padding:50px;
+            border-radius:20px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.2);
+          ">
+            <h1>YAYYY 😭💖</h1>
+            <p style="font-size:20px;">ily so much you have no idea</p>
+            <p>best valentine ever (it’s you)</p>
+            <p>(≧◡≦) ♡</p>
+          </div>
+        </div>
+      `;
+    });
+  </script>
+
+</body>
+</html>
