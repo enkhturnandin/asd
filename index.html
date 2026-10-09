@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>be my valentine</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -16,6 +18,37 @@
       overflow: hidden;
     }
 
+  
+    .bg-hearts {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .heart-particle {
+      position: absolute;
+      bottom: -20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 20px;
+      animation: floatUp 6s linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(0.8) rotate(0deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-105vh) scale(1.2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
     .container {
       background: white;
       padding: 40px;
@@ -24,10 +57,14 @@
       position: relative;
       z-index: 1;
       max-width: 420px;
+      width: 90%;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
     }
 
     h1 {
       margin-bottom: 20px;
+      color: #2d3748;
     }
 
     .gif {
@@ -40,14 +77,22 @@
       border-radius: 10px;
     }
 
+    .button-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      min-height: 70px;
+      position: relative;
+    }
+
     button {
       padding: 15px 30px;
       font-size: 18px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      margin: 10px;
-      transition: transform 0.3s ease;
+      transition: transform 0.2s ease, background-color 0.2s ease;
     }
 
     #yesBtn {
@@ -55,35 +100,75 @@
       color: white;
       position: relative;
       z-index: 9999;
+      box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+    }
+
+    #yesBtn:hover {
+      background-color: #e43b5b;
     }
 
     #noBtn {
-      background-color: #ccc;
+      background-color: #e2e8f0;
+      color: #4a5568;
+      position: relative;
+      transition: all 0.2s ease-out;
+    }
+
+    #noBtn:hover {
+      background-color: #cbd5e1;
     }
 
     #message {
       margin-top: 15px;
       font-size: 16px;
       color: #ff4d6d;
-      min-height: 20px;
+      min-height: 24px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  
+  <div class="bg-hearts" id="bgHearts"></div>
+
+  <div class="container" id="cardContainer">
     <h1>will you be my valentine </h1>
 
     <div class="gif">
-      <img src="https://i.pinimg.com/originals/f7/e7/52/f7e752cdf31b6a4a56d45c431e869d27.gif" alt="cute gif">
+      <img id="mainGif" src="https://i.pinimg.com/originals/f7/e7/52/f7e752cdf31b6a4a56d45c431e869d27.gif" alt="cute gif">
     </div>
 
-    <button id="yesBtn">YES</button>
-    <button id="noBtn">no</button>
+    <div class="button-group" id="buttonGroup">
+      <button id="yesBtn">YES</button>
+      <button id="noBtn">no</button>
+    </div>
+    
     <div id="message"></div>
   </div>
 
   <script>
+    
+    const bgHearts = document.getElementById('bgHearts');
+    const heartSymbols = ['.☘︎ ݁˖', '𖹭', '𑣲𝄞', '❀', '♡゙', '(˶˃ ᵕ ˂˶)'];
+
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'heart-particle';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = (Math.random() * 4 + 4) + 's';
+      heart.style.fontSize = (Math.random() * 12 + 16) + 'px';
+      heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+      bgHearts.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 8000);
+    }
+
+    setInterval(createHeart, 500);
+    for (let i = 0; i < 6; i++) { createHeart(); }
+
     const noMessages = [
       "are you sure?? ",
       "think again.",
@@ -94,44 +179,112 @@
       "say yes before i embarrass myself more"
     ];
 
+    const altGifs = [
+      "https://i.pinimg.com/originals/f7/e7/52/f7e752cdf31b6a4a56d45c431e869d27.gif",
+      "https://media.giphy.com/media/3o7TKSjRrfIPjeiOkM/giphy.gif",
+      "https://media.giphy.com/media/9XY4f3FgEDT4Q/giphy.gif"
+    ];
+
     let noClickCount = 0;
     let yesScale = 1;
 
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const message = document.getElementById("message");
+    const mainGif = document.getElementById("mainGif");
+    const cardContainer = document.getElementById("cardContainer");
+
+    
+    function dodgeNoButton() {
+      if (noClickCount < 2) return;
+      
+      const cardRect = cardContainer.getBoundingClientRect();
+      const maxX = cardRect.width / 3;
+      const maxY = 40;
+      
+      const randomX = (Math.random() - 0.5) * maxX * 2;
+      const randomY = (Math.random() - 0.5) * maxY * 2;
+
+      noBtn.style.position = 'absolute';
+      noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+    }
+
+    noBtn.addEventListener("mouseover", dodgeNoButton);
+    noBtn.addEventListener("touchstart", (e) => {
+      dodgeNoButton();
+      e.preventDefault();
+    });
 
     noBtn.addEventListener("click", () => {
-      message.textContent =
-        noMessages[Math.min(noClickCount, noMessages.length - 1)];
+      message.textContent = noMessages[Math.min(noClickCount, noMessages.length - 1)];
+      
+      if (noClickCount < altGifs.length) {
+        mainGif.src = altGifs[noClickCount % altGifs.length];
+      }
+
       noClickCount++;
 
-      yesScale += 0.6;
+      
+      yesScale += 0.45;
       yesBtn.style.transform = `scale(${yesScale})`;
+
+  
+      const noScale = Math.max(1 - noClickCount * 0.1, 0.4);
+      noBtn.style.fontSize = `${Math.max(18 - noClickCount * 1.5, 12)}px`;
+      noBtn.style.padding = `${Math.max(15 - noClickCount * 1.5, 8)}px ${Math.max(30 - noClickCount * 3, 15)}px`;
+
+      if (noClickCount >= 6) {
+        noBtn.style.display = 'none';
+        message.textContent = "okay fine the no button is gone you only have one choice left";
+      }
     });
 
     yesBtn.addEventListener("click", () => {
+      
+      const duration = 3.5 * 1000;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 60,
+          origin: { x: 0 },
+          colors: ['#ff4d6d', '#ff9a9e', '#ffffff']
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 60,
+          origin: { x: 1 },
+          colors: ['#ff4d6d', '#fad0c4', '#ffffff']
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+
+      
       document.body.innerHTML = `
         <div style="
-          height:100vh;
-          display:flex;
-          justify-content:center;
-          align-items:center;
-          background:linear-gradient(135deg, #ff9a9e, #fad0c4);
-          font-family:Arial, sans-serif;
-          text-align:center;
+          background: white;
+          padding: 50px;
+          border-radius: 20px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+          text-align: center;
+          max-width: 420px;
+          width: 90%;
+          position: relative;
+          z-index: 10;
         ">
-          <div style="
-            background:white;
-            padding:50px;
-            border-radius:20px;
-            box-shadow:0 10px 30px rgba(0,0,0,0.2);
-          ">
-            <h1>YAYYY </h1>
-            <p style="font-size:20px;">ily so much you have no idea</p>
-            <p>best valentine ever (it’s you)</p>
-            <p>(≧◡≦) ♡</p>
+          <div style="width: 180px; margin: 0 auto 20px;">
+            <img src="https://i.pinimg.com/originals/74/49/f7/7449f70624a9194bb24558509e51c893.gif" alt="celebration gif" style="width: 100%; border-radius: 10px;">
           </div>
+          <h1 style="color: #2d3748; margin-bottom: 15px;">YAYYY </h1>
+          <p style="font-size: 20px; color: #4a5568; margin: 10px 0;">ily so much you have no idea</p>
+          <p style="color: #718096; margin: 8px 0;">best valentine ever (it’s you)</p>
+          <p style="font-size: 24px; color: #ff4d6d; margin-top: 20px;">(≧◡≦) ♡</p>
         </div>
       `;
     });
